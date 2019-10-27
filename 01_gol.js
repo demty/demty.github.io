@@ -11,6 +11,7 @@ let cols;
 let pointsToRemove;
 let rows;
 let resolution = 10;
+let stopDraw = false;
 
 function setup() {
     createCanvas(600, 400);
@@ -28,9 +29,17 @@ function setup() {
     background(0);
 }
 
+function keyPressed() {
+    if (keyCode === 32) {
+        stopDraw = !stopDraw;
+    }
+    return false;
+}
+
+
 function mouseClicked() {
-    draw();
     grid[floor(mouseX / resolution)][floor(mouseY / resolution)] = 1;
+    return false;
 }
 
 function draw() {
@@ -53,24 +62,26 @@ function draw() {
             }
         }
     }
-    let newGrid = make2DArray(cols, rows);
-    for (let i = 0; i < cols; i++) {
-        for (let j = 0; j < rows; j++) {
-            let state = grid[i][j];
-            let neighbors = countNeighbors(grid, i, j);
+    if (!stopDraw) {
+        let newGrid = make2DArray(cols, rows);
+        for (let i = 0; i < cols; i++) {
+            for (let j = 0; j < rows; j++) {
+                let state = grid[i][j];
+                let neighbors = countNeighbors(grid, i, j);
 
-            if (state === 0 && neighbors === 3) {
-                newGrid[i][j] = 1;
-            } else if (state === 1 && (neighbors < 2 || neighbors > 3)) {
-                newGrid[i][j] = 0;
-                pointsToRemove.push({'x': i, 'y': j});
-            } else {
-                newGrid[i][j] = state;
+                if (state === 0 && neighbors === 3) {
+                    newGrid[i][j] = 1;
+                } else if (state === 1 && (neighbors < 2 || neighbors > 3)) {
+                    newGrid[i][j] = 0;
+                    pointsToRemove.push({'x': i, 'y': j});
+                } else {
+                    newGrid[i][j] = state;
+                }
+
             }
-
         }
+        grid = newGrid;
     }
-    grid = newGrid;
 }
 
 function countNeighbors(grid, x, y) {
